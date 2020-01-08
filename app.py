@@ -1,15 +1,36 @@
+from functools import wraps
 from flask import Flask, g, request, jsonify
 
 from db import connect_db, get_db
 
 app = Flask(__name__)
 
+
+api_user = 'admin'
+api_password = 'admin'
+
+def protected(view):
+    @wraps(view)
+    def decorated_view(*args, **kwargs):
+        auth = request.authorization
+
+        if not auth:
+            return jsonify({'message': 'No authentication headers present in request.'}), 403
+
+        if auth.username == api_user and auth.password == api_password:
+            return view(*args, **kwargs)
+        else:
+            return jsonify({'message': 'Authentication failed.'}), 403
+
+    return decorated_view
+    
 @app.teardown_appcontext
 def close_db(error):
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
 
 @app.route('/members', methods=['GET'])
+@protected
 def get_members():
     db = get_db()
     members_query = db.execute('select id, name, email, level from members')
@@ -27,6 +48,7 @@ def get_members():
     return jsonify({'members': members_list})
 
 @app.route('/members/<int:member_id>', methods=['GET'])
+@protected
 def get_member(member_id):
     db = get_db()
     member_query = db.execute('select id, name, email, level from members where id = ?', [int(member_id)])
@@ -45,6 +67,7 @@ def get_member(member_id):
     return jsonify({'member': member})
 
 @app.route('/members', methods=['POST'])
+@protected
 def add_member():
     db = get_db()
 
@@ -74,6 +97,7 @@ def add_member():
     return jsonify(member_response)
 
 @app.route('/members/<int:member_id>', methods=['PUT', 'PATCH'])
+@protected
 def update_member(member_id):
     db = get_db()
 
@@ -118,6 +142,7 @@ def update_member(member_id):
     return jsonify({'member': result})
 
 @app.route('/members/<int:member_id>', methods=['DELETE'])
+@protected
 def delete_member(member_id):
     db = get_db()
     member_query = db.execute('select id, name, email, level from members where id = ?', [member_id])
@@ -139,4 +164,4 @@ def delete_member(member_id):
     return jsonify({'message': f'Deleted member number {member_id}', 'member': result})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()

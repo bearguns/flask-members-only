@@ -1,8 +1,10 @@
 #### membersonly RESTful api example ####
 :baseurl = http://localhost:5000
+:auth := (format "Basic %s" (base64-encode-string (format "%s:%s" "admin" "admin")))
 
 # GET members
 GET :baseurl/members
+Authorization: :auth
 #
 
 # GET member by id
