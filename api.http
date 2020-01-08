@@ -1,0 +1,20 @@
+#### membersonly RESTful api example ####
+:baseurl = http://localhost:5000
+
+# GET members
+GET :baseurl/members
+
+# GET member by id
+GET :baseurl/members/14
+
+# POST add member
+POST :baseurl/members
+
+# update member with PUT
+PUT :baseurl/members/14
+
+# update member with PATCH
+PATCH :baseurl/members/14
+
+# delete member by ID
+DELETE :baseurl/members/14
