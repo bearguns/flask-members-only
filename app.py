@@ -9,7 +9,7 @@ def close_db(error):
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
 
-        @app.route('/members', methods=['GET'])
+@app.route('/members', methods=['GET'])
 def get_members():
     db = get_db()
     members_query = db.execute('select id, name, email, level from members')
@@ -119,7 +119,24 @@ def update_member(member_id):
 
 @app.route('/members/<int:member_id>', methods=['DELETE'])
 def delete_member(member_id):
-    return 'Deletes member'
+    db = get_db()
+    member_query = db.execute('select id, name, email, level from members where id = ?', [member_id])
+    member_record = member_query.fetchone()
+
+    if not member_record:
+        return jsonify({'error': f'No member found with id: {member_id}'}), 404
+
+    result = {
+        'id': member_record['id'],
+        'name': member_record['name'],
+        'email': member_record['email'],
+        'level': member_record['level']
+    }
+
+    db.execute('delete from members where id = ?', [member_id])
+    db.commit()
+
+    return jsonify({'message': f'Deleted member number {member_id}', 'member': result})
 
 if __name__ == '__main__':
     app.run(debug=True)

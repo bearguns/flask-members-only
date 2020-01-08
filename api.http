@@ -7,14 +7,14 @@ GET :baseurl/members
 
 # GET member by id
 GET :baseurl/members/3
-
+#
 # POST add member
 POST :baseurl/members
 Content-Type: application/json
 {
-        "name": "testuser",
-        "email": "testuser@foo.ca",
-        "level": "platinum"
+        "name": "testuser4",
+        "email": "testuser@foofoo.ca",
+        "level": "bronze"
 }
 #
 
@@ -59,4 +59,4 @@ Content-Type: application/json
 }
 
 # delete member by ID
-DELETE :baseurl/members/14
+DELETE :baseurl/members/3
