@@ -3,13 +3,30 @@
 
 # GET members
 GET :baseurl/members
+#
 
 # GET member by id
 GET :baseurl/members/14
 
 # POST add member
 POST :baseurl/members
+Content-Type: application/json
+{
+        "name": "testuser",
+        "email": "testuser@foo.ca",
+        "level": "platinum"
+}
+#
 
+# POST add member
+POST :baseurl/members
+Content-Type: application/json
+{
+        "name": "testuser2",
+        "email": "testuser2@foo.ca",
+        "level": "gold"
+}
+#
 # update member with PUT
 PUT :baseurl/members/14
 
