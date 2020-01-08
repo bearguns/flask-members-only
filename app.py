@@ -24,11 +24,25 @@ def get_members():
         } for m in members_result
     ]
 
-    return jsonify(members_list)
+    return jsonify({'members': members_list})
 
 @app.route('/members/<int:member_id>', methods=['GET'])
 def get_member(member_id):
-    return 'Returns a single member'
+    db = get_db()
+    member_query = db.execute('select id, name, email, level from members where id = ?', [int(member_id)])
+    member_record = member_query.fetchone()
+
+    if not member_record:
+        return jsonify({'error': f'No member found with id {member_id}'}), 404
+
+    member = {
+        'id': member_record['id'],
+        'name': member_record['name'],
+        'email': member_record['email'],
+        'level': member_record['level']
+    }
+
+    return jsonify({'member': member})
 
 @app.route('/members', methods=['POST'])
 def add_member():

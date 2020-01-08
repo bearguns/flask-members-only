@@ -6,7 +6,7 @@ GET :baseurl/members
 #
 
 # GET member by id
-GET :baseurl/members/14
+GET :baseurl/members/1
 
 # POST add member
 POST :baseurl/members
