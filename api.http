@@ -6,7 +6,7 @@ GET :baseurl/members
 #
 
 # GET member by id
-GET :baseurl/members/1
+GET :baseurl/members/3
 
 # POST add member
 POST :baseurl/members
@@ -27,11 +27,36 @@ Content-Type: application/json
         "level": "gold"
 }
 #
-# update member with PUT
-PUT :baseurl/members/14
+
+# update member with PUT (no missing values)
+PUT :baseurl/members/3
+Content-Type: application/json
+{
+        "name": "testuser2",
+        "email": "testyboy@foo.ca",
+        "level": "platinum"
+}
+
+# update member with PUT (missing values)
+PUT :baseurl/members/3
+Content-Type: application/json
+{
+        "name": "testuser2",
+        "level": "platinum"
+}
 
 # update member with PATCH
-PATCH :baseurl/members/14
+PATCH :baseurl/members/3
+Content-Type: application/json
+{
+        "name": "FooFoo Beanz"
+}
+# update member with PATCH
+PATCH :baseurl/members/3
+Content-Type: application/json
+{
+        "level": "silver"
+}
 
 # delete member by ID
 DELETE :baseurl/members/14

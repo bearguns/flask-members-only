@@ -8,8 +8,8 @@ app = Flask(__name__)
 def close_db(error):
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
-        
-@app.route('/members', methods=['GET'])
+
+        @app.route('/members', methods=['GET'])
 def get_members():
     db = get_db()
     members_query = db.execute('select id, name, email, level from members')
@@ -75,11 +75,51 @@ def add_member():
 
 @app.route('/members/<int:member_id>', methods=['PUT', 'PATCH'])
 def update_member(member_id):
-    return 'Updates a member'
+    db = get_db()
+
+    if request.method == 'PUT':
+        error = None
+        fields = ['name', 'email', 'level']
+        request_json = request.get_json()
+
+        for field in fields:
+            if not field in request_json:
+                error = f'Some required fields missing. If you are trying to update a single field, please make a PATCH request instead of PUT. Missing field: {field}'
+                return jsonify({'error': error}), 400
+
+        name = request_json['name']
+        email = request_json['email']
+        level = request_json['level']
+
+        db.execute('update members set name = ?, email = ?, level = ? where id = ?', [name, email, level, member_id])
+        db.commit()
+
+    if request.method == 'PATCH':
+        update_json = request.get_json()
+        existing_member_query = db.execute('select id, name, email, level from members where id = ?', [member_id])
+        existing_member = existing_member_query.fetchone()
+        name = 'name' in update_json and update_json['name'] or existing_member['name']
+        email = 'email' in update_json and update_json['email'] or existing_member['email']
+        level = 'level' in update_json and update_json['level'] or existing_member['level']
+
+        db.execute('update members set name = ?, email = ?, level = ? where id = ?', [name, email, level, member_id])
+        db.commit()
+
+    # Always query for and return the updated member record, regardless of method
+    member_query = db.execute('select id, name, email, level from members where id = ?', [member_id])
+    member_record = member_query.fetchone()
+    result = {
+        'id': member_record['id'],
+        'name': member_record['name'],
+        'email': member_record['email'],
+        'level': member_record['level']
+    }
+
+    return jsonify({'member': result})
 
 @app.route('/members/<int:member_id>', methods=['DELETE'])
 def delete_member(member_id):
     return 'Deletes member'
-    
+
 if __name__ == '__main__':
     app.run(debug=True)
